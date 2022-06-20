@@ -239,7 +239,9 @@ You can list all versions with \`git tag -l --sort taggerdate 'v*'' and then tag
 
   local branch push_cmd="git push $new_version"
   if branch=$(git symbolic-ref --short "$REF" 2>/dev/null); then
-    push_cmd="git push --atomic $branch $new_version"
+    local upstream
+    upstream=$(git config "branch.$branch.remote" 2>/dev/null)
+    push_cmd="git push --atomic $upstream $branch $new_version"
   fi
   printf -- "Release the new version by running \`%s'\n" "$push_cmd" >&2
   return $ret
