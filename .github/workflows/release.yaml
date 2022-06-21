@@ -1,4 +1,4 @@
-name: Compile & publish
+name: Release
 
 on:
   push:
@@ -6,8 +6,34 @@ on:
     - 'v*'
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint.yaml
+
+  publish:
+    name: Publish to npmjs.org
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
+    - name: Setup .npmrc
+      run: cp tools/_.npmrc .npmrc
+    - name: Build the release
+      run: mkdir dist && cp -a src/git-release README.md dist/
+    - name: Configure the package.json for publishing
+      run: jq 'del(.devDependencies,.scripts,.private)' package.json > dist/package.json
+    - name: Publish the package
+      run: yarn publish --access public --no-git-tag-version --new-version "${REF#refs\/tags\/v}"
+      env:
+        REF: ${{ github.ref }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN_RW }}
+      working-directory: dist
+
   create-release:
     name: Create GitHub Release
+    needs: [lint, publish]
     runs-on: ubuntu-latest
     steps:
       - name: Determine tag name
@@ -40,28 +66,3 @@ jobs:
           body: ${{ steps.tag-message.outputs.message }}
           draft: false
           prerelease: false
-
-  publish:
-    name: Publish to npmjs.org
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 14
-    - name: Build the release
-      run: tools/build.sh
-      env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN_RO }}
-    - name: Set release version from tag name
-      env:
-        REF: ${{ github.ref }}
-      run: jq --arg version "${REF/#refs\/tags\/v/}" '.version=$version' package.json > package.new.json && mv package.new.json package.json
-      working-directory: dist
-    - name: Setup .npmrc
-      run: cp tools/_.npmrc dist/.npmrc
-    - name: Publish the package
-      run: yarn publish --new-version "$(jq -r .version package.json)"
-      env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN_RW }}
-      working-directory: dist
