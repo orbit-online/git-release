@@ -36,7 +36,6 @@ jobs:
       with:
         name: dist
         path: dist
-    - run: ls -al .; ls -al dist
     - name: Configure the package.json for publishing
       run: jq --arg version "${REF#refs\/tags\/v}" 'del(.devDependencies,.scripts,.private) | .version=$version' package.json > dist/package.json
       env:
