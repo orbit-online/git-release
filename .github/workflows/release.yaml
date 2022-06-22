@@ -6,23 +6,8 @@ on:
     - 'v*'
 
 jobs:
-  lint:
-    uses: ./.github/workflows/lint.yaml
-
   build:
-    name: Build
-    needs: [lint]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build the release
-      run: mkdir dist && cp -a src/git-release README.md dist/
-    - name: Archive compilation result
-      uses: actions/upload-artifact@v3
-      with:
-        name: dist
-        path: dist
-        retention-days: 1
+    uses: ./.github/workflows/build.yaml
 
   publish:
     name: Publish to npmjs.org
@@ -34,8 +19,9 @@ jobs:
       run: cp tools/_.npmrc .npmrc
     - uses: actions/download-artifact@v3
       with:
-        name: dist
-        path: dist
+        name: dist.tar
+    - name: Unpack compilation artifact
+      run: mkdir dist && tar -xf dist.tar -C dist
     - name: Configure the package.json for publishing
       run: jq --arg version "${REF#refs\/tags\/v}" 'del(.devDependencies,.scripts,.private) | .version=$version' package.json > dist/package.json
       env:
@@ -46,11 +32,13 @@ jobs:
         args: yarn --cwd dist publish --access public --no-git-tag-version
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN_RW }}
-    - name: Add package.json to dist artifact
-      uses: actions/upload-artifact@v3
+    - name: Update compilation artifact
+      run: tar -cf ../dist.tar *
+      working-directory: dist
+    - uses: actions/upload-artifact@v3
       with:
-        name: dist
-        path: dist/package.json
+        name: dist.tar
+        path: dist.tar
         retention-days: 1
 
   create-release:
@@ -58,39 +46,38 @@ jobs:
     needs: [publish]
     runs-on: ubuntu-latest
     steps:
-      - name: Determine version
-        id: version
-        run: printf "::set-output name=tag::%s\n" "${REF#refs\/tags\/}"
-        env:
-          REF: ${{ github.ref }}
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ steps.version.outputs.tag }}
-      - name: Get release notes from tag
-        id: tag-message
-        run: |
-          MESSAGE=$(git tag -l --format='%(contents)' "${REF#refs\/tags\/}")
-          MESSAGE=${MESSAGE//'%'/'%25'}
-          MESSAGE=${MESSAGE//$'\n'/'%0A'}
-          MESSAGE=${MESSAGE//$'\r'/'%0D'}
-          printf "::set-output name=message::%s\n" "$MESSAGE"
-        env:
-          REF: ${{ github.ref }}
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist
-      - name: Create an archive of the build
-        run: tar -czf ../${{ steps.version.outputs.tag }}.tar.gz *
-        working-directory: dist
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          name: ${{ steps.version.outputs.tag }}
-          body: ${{ steps.tag-message.outputs.message }}
-          draft: false
-          prerelease: false
-          artifacts: ${{ steps.version.outputs.tag }}.tar.gz
-          artifactErrorsFailBuild: true
-          artifactContentType: application/gzip
+    - name: Determine version
+      id: version
+      run: printf "::set-output name=tag::%s\n" "${REF#refs\/tags\/}"
+      env:
+        REF: ${{ github.ref }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ steps.version.outputs.tag }}
+    - name: Get release notes from tag
+      id: tag-message
+      run: |
+        MESSAGE=$(git tag -l --format='%(contents)' "${REF#refs\/tags\/}")
+        MESSAGE=${MESSAGE//'%'/'%25'}
+        MESSAGE=${MESSAGE//$'\n'/'%0A'}
+        MESSAGE=${MESSAGE//$'\r'/'%0D'}
+        printf "::set-output name=message::%s\n" "$MESSAGE"
+      env:
+        REF: ${{ github.ref }}
+    - uses: actions/download-artifact@v3
+      with:
+        name: dist.tar
+        path: ${{ steps.version.outputs.tag }}.tar
+    - name: Compress comilation artifact
+      run: gzip ${{ steps.version.outputs.tag }}.tar
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        name: ${{ steps.version.outputs.tag }}
+        body: ${{ steps.tag-message.outputs.message }}
+        draft: false
+        prerelease: false
+        artifacts: ${{ steps.version.outputs.tag }}.tar.gz
+        artifactErrorsFailBuild: true
+        artifactContentType: application/gzip

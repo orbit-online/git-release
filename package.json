@@ -8,7 +8,7 @@
 	"homepage": "https://github.com/orbit-online/git-release#readme",
 	"private": true,
 	"bin": {
-		"git-release": "./bin/git-release"
+		"git-release": "./git-release"
 	},
 	"author": {
 		"name": "Orbit Online A/S",

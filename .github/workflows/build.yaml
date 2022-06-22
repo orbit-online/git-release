@@ -1,0 +1,31 @@
+name: Build
+
+on: [push, workflow_call]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Lint with shellcheck
+      uses: ludeeus/action-shellcheck@master
+      with:
+        scandir: './src'
+
+  build:
+    name: Build
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the release
+      run: mkdir dist && cp -a src/git-release README.md dist/
+    - name: Create compilation artifact
+      run: tar -cf ../dist.tar *
+      working-directory: dist
+    - uses: actions/upload-artifact@v3
+      with:
+        name: dist.tar
+        path: dist.tar
+        retention-days: 1
