@@ -9,16 +9,34 @@ jobs:
   lint:
     uses: ./.github/workflows/lint.yaml
 
+  build:
+    name: Build
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the release
+      run: mkdir dist && cp -a src/git-release README.md dist/
+    - name: Archive compilation result
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist
+        retention-days: 1
+
   publish:
     name: Publish to npmjs.org
-    needs: [lint]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Setup .npmrc
       run: cp tools/_.npmrc .npmrc
-    - name: Build the release
-      run: mkdir dist && cp -a src/git-release README.md dist/
+    - uses: actions/download-artifact@v3
+      with:
+        name: dist
+        path: dist
+    - run: ls -al .; ls -al dist
     - name: Configure the package.json for publishing
       run: jq --arg version "${REF#refs\/tags\/v}" 'del(.devDependencies,.scripts,.private) | .version=$version' package.json > dist/package.json
       env:
@@ -29,39 +47,51 @@ jobs:
         args: yarn --cwd dist publish --access public --no-git-tag-version
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN_RW }}
+    - name: Add package.json to dist artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/package.json
+        retention-days: 1
 
   create-release:
     name: Create GitHub Release
-    needs: [lint, publish]
+    needs: [publish]
     runs-on: ubuntu-latest
     steps:
-      - name: Determine tag name
-        id: tag-name
+      - name: Determine version
+        id: version
+        run: printf "::set-output name=tag::%s\n" "${REF#refs\/tags\/}"
         env:
           REF: ${{ github.ref }}
-        run: |
-          printf "::set-output name=tag::%s\n" "$(basename "${{ github.ref }}")"
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: ${{ steps.tag-name.outputs.tag }}
+          ref: ${{ steps.version.outputs.tag }}
       - name: Get release notes from tag
         id: tag-message
-        env:
-          REF: ${{ github.ref }}
         run: |
-          MESSAGE=$(git tag -l --format='%(contents)' "${{ steps.tag-name.outputs.tag }}")
+          MESSAGE=$(git tag -l --format='%(contents)' "${REF#refs\/tags\/}")
           MESSAGE=${MESSAGE//'%'/'%25'}
           MESSAGE=${MESSAGE//$'\n'/'%0A'}
           MESSAGE=${MESSAGE//$'\r'/'%0D'}
           printf "::set-output name=message::%s\n" "$MESSAGE"
-      - name: Create Release
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF: ${{ github.ref }}
+      - uses: actions/download-artifact@v3
         with:
-          tag_name: ${{ steps.tag-name.outputs.tag }}
-          release_name: ${{ steps.tag-name.outputs.tag }}
+          name: dist
+          path: dist
+      - name: Create an archive of the build
+        run: tar -czf ../${{ steps.version.outputs.tag }}.tar.gz *
+        working-directory: dist
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{ steps.version.outputs.tag }}
           body: ${{ steps.tag-message.outputs.message }}
           draft: false
           prerelease: false
+          artifacts: ${{ steps.version.outputs.tag }}.tar.gz
+          artifactErrorsFailBuild: true
+          artifactContentType: application/gzip
