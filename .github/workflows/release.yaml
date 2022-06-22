@@ -15,21 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 14
     - name: Setup .npmrc
       run: cp tools/_.npmrc .npmrc
     - name: Build the release
       run: mkdir dist && cp -a src/git-release README.md dist/
     - name: Configure the package.json for publishing
-      run: jq 'del(.devDependencies,.scripts,.private)' package.json > dist/package.json
-    - name: Publish the package
-      run: yarn publish --access public --no-git-tag-version --new-version "${REF#refs\/tags\/v}"
+      run: jq --arg version "${REF#refs\/tags\/v}" 'del(.devDependencies,.scripts,.private) | .version=$version' package.json > dist/package.json
       env:
         REF: ${{ github.ref }}
+    - name: Publish the package
+      uses: docker://node:14.18.2-alpine3.14
+      with:
+        args: yarn --cwd dist publish --access public --no-git-tag-version
+      env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN_RW }}
-      working-directory: dist
 
   create-release:
     name: Create GitHub Release
