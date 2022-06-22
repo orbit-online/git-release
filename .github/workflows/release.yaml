@@ -68,9 +68,8 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: dist.tar
-        path: ${{ steps.version.outputs.tag }}.tar
-    - name: Compress comilation artifact
-      run: gzip ${{ steps.version.outputs.tag }}.tar
+    - name: Compress release artifact
+      run: gzip dist.tar && mv dist.tar.gz ${{ steps.version.outputs.tag }}.tar.gz
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
