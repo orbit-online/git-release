@@ -16,8 +16,8 @@ Options:
   -h, --help      Show this screen
 
 Notes:
-  git-release automatically determines the last version based on the tags
-  reachable from REF and then bumps the specified part of that version.
+  git-release automatically determines the previous version using git-describe
+  and then bumps the specified part of that version.
   REF defaults to HEAD.
 '
 # docopt parser below, refresh this parser with `docopt.sh git-release`
@@ -116,34 +116,34 @@ eval "var_$1+=($value)"; else eval "var_$1=$value"; fi; return 0; fi; done
 return 1; }; stdout() { printf -- "cat <<'EOM'\n%s\nEOM\n" "$1"; }; stderr() {
 printf -- "cat <<'EOM' >&2\n%s\nEOM\n" "$1"; }; error() {
 [[ -n $1 ]] && stderr "$1"; stderr "$usage"; _return 1; }; _return() {
-printf -- "exit %d\n" "$1"; exit "$1"; }; set -e; trimmed_doc=${DOC:0:560}
-usage=${DOC:75:86}; digest=f49c8; shorts=('' -h -d -n)
-longs=(--ignore-dirty --help --debug --dry-run); argcounts=(0 0 0 0); node_0(){
-switch __ignore_dirty 0; }; node_1(){ switch __help 1; }; node_2(){
-switch __debug 2; }; node_3(){ switch __dry_run 3; }; node_4(){ value REF a; }
+printf -- "exit %d\n" "$1"; exit "$1"; }; set -e; trimmed_doc=${DOC:0:546}
+usage=${DOC:75:86}; digest=6e96a; shorts=(-d '' -n -h)
+longs=(--debug --ignore-dirty --dry-run --help); argcounts=(0 0 0 0); node_0(){
+switch __debug 0; }; node_1(){ switch __ignore_dirty 1; }; node_2(){
+switch __dry_run 2; }; node_3(){ switch __help 3; }; node_4(){ value REF a; }
 node_5(){ value VERSION a; }; node_6(){ _command major; }; node_7(){
 _command minor; }; node_8(){ _command patch; }; node_9(){ optional 0 1 2 3; }
 node_10(){ optional 9; }; node_11(){ either 6 7 8; }; node_12(){ required 11; }
 node_13(){ optional 4; }; node_14(){ required 10 12 13; }; node_15(){
 required 10 5 13; }; node_16(){ either 14 15; }; node_17(){ required 16; }
 cat <<<' docopt_exit() { [[ -n $1 ]] && printf "%s\n" "$1" >&2
-printf "%s\n" "${DOC:75:86}" >&2; exit 1; }'; unset var___ignore_dirty \
-var___help var___debug var___dry_run var_REF var_VERSION var_major var_minor \
-var_patch; parse 17 "$@"; local prefix=${DOCOPT_PREFIX:-''}
-unset "${prefix}__ignore_dirty" "${prefix}__help" "${prefix}__debug" \
-"${prefix}__dry_run" "${prefix}REF" "${prefix}VERSION" "${prefix}major" \
+printf "%s\n" "${DOC:75:86}" >&2; exit 1; }'; unset var___debug \
+var___ignore_dirty var___dry_run var___help var_REF var_VERSION var_major \
+var_minor var_patch; parse 17 "$@"; local prefix=${DOCOPT_PREFIX:-''}
+unset "${prefix}__debug" "${prefix}__ignore_dirty" "${prefix}__dry_run" \
+"${prefix}__help" "${prefix}REF" "${prefix}VERSION" "${prefix}major" \
 "${prefix}minor" "${prefix}patch"
-eval "${prefix}"'__ignore_dirty=${var___ignore_dirty:-false}'
-eval "${prefix}"'__help=${var___help:-false}'
 eval "${prefix}"'__debug=${var___debug:-false}'
+eval "${prefix}"'__ignore_dirty=${var___ignore_dirty:-false}'
 eval "${prefix}"'__dry_run=${var___dry_run:-false}'
+eval "${prefix}"'__help=${var___help:-false}'
 eval "${prefix}"'REF=${var_REF:-}'; eval "${prefix}"'VERSION=${var_VERSION:-}'
 eval "${prefix}"'major=${var_major:-false}'
 eval "${prefix}"'minor=${var_minor:-false}'
 eval "${prefix}"'patch=${var_patch:-false}'; local docopt_i=1
 [[ $BASH_VERSION =~ ^4.3 ]] && docopt_i=2; for ((;docopt_i>0;docopt_i--)); do
-declare -p "${prefix}__ignore_dirty" "${prefix}__help" "${prefix}__debug" \
-"${prefix}__dry_run" "${prefix}REF" "${prefix}VERSION" "${prefix}major" \
+declare -p "${prefix}__debug" "${prefix}__ignore_dirty" "${prefix}__dry_run" \
+"${prefix}__help" "${prefix}REF" "${prefix}VERSION" "${prefix}major" \
 "${prefix}minor" "${prefix}patch"; done; }
 # docopt parser above, complete command for generating this parser is `docopt.sh git-release`
   eval "$(docopt "$@")"
@@ -161,14 +161,13 @@ declare -p "${prefix}__ignore_dirty" "${prefix}__help" "${prefix}__debug" \
   fi
 
   # shellcheck disable=2154
-  if ! $__ignore_dirty && (! git diff --no-ext-diff --quiet --exit-code || ! git diff-index --quiet --cached HEAD 2>/dev/null); then
+  if [[ $REF = HEAD ]] && ! $__ignore_dirty && (! git diff --no-ext-diff --quiet --exit-code || ! git diff-index --quiet --cached HEAD 2>/dev/null); then
     printf "Working copy is dirty, refusing to release\n" >&2
     exit 1
   fi
 
   local _v v_major v_minor v_patch _rest last_version
-  last_version=$(git tag -l --sort taggerdate --merged "$REF" 'v*' | tail -n1)
-  if [[ -z $last_version ]]; then
+  if ! last_version=$(git describe --tag --abbrev=0 --match='v*' "$REF" 2>/dev/null); then
     v_major=0
     v_minor=0
     v_patch=0
