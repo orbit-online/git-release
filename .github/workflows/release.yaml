@@ -27,6 +27,8 @@ jobs:
       run: jq --arg version "${REF#refs\/tags\/v}" 'del(.devDependencies,.scripts,.private) | .version=$version' package.json > dist/package.json
       env:
         REF: ${{ github.ref }}
+    - name: Include README.md in the package
+      run: cp README.md dist/
     - name: Publish the package
       uses: docker://node:14.18.2-alpine3.14
       with:
