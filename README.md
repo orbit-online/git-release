@@ -12,8 +12,9 @@ the commit is on will not be discovered.
 ```
 git-release - Tag REF by either bumping the last version or specifying one
 Usage:
-  release [options] (major|minor|patch) [REF]
-  release [options] VERSION [REF]
+  git-release [-dnh] previous [REF]
+  git-release [options] (major|minor|patch) [REF]
+  git-release [options] VERSION [REF]
 
 Options:
   --ignore-dirty  Ignore a dirty working copy when REF is HEAD
@@ -22,7 +23,8 @@ Options:
   -h, --help      Show this screen
 
 Notes:
-  git-release automatically determines the last version based on the tags
-  reachable from REF and then bumps the specified part of that version.
+  git-release automatically determines the previous version using git-describe
+  and then bumps the specified part of that version.
+  Use `git-release previous' to show the previous version based on REF.
   REF defaults to HEAD.
 ```
