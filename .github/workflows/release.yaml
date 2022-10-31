@@ -15,7 +15,7 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup .npmrc
       run: cp tools/_.npmrc .npmrc
     - uses: actions/download-artifact@v3
@@ -51,11 +51,11 @@ jobs:
     steps:
     - name: Determine version
       id: version
-      run: printf "::set-output name=tag::%s\n" "${REF#refs\/tags\/}"
+      run: printf "tag=%s\n" "${REF#refs\/tags\/}" >> $GITHUB_OUTPUT
       env:
         REF: ${{ github.ref }}
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: ${{ steps.version.outputs.tag }}
     - name: Get release notes from tag
@@ -65,7 +65,7 @@ jobs:
         MESSAGE=${MESSAGE//'%'/'%25'}
         MESSAGE=${MESSAGE//$'\n'/'%0A'}
         MESSAGE=${MESSAGE//$'\r'/'%0D'}
-        printf "::set-output name=message::%s\n" "$MESSAGE"
+        printf "message=%s\n" "$MESSAGE" >> $GITHUB_OUTPUT
       env:
         REF: ${{ github.ref }}
     - uses: actions/download-artifact@v3

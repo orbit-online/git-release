@@ -7,7 +7,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Lint with shellcheck
       uses: ludeeus/action-shellcheck@master
       with:
@@ -18,7 +18,7 @@ jobs:
     needs: [lint]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build the release
       run: mkdir dist && cp -a src/git-release dist/
     - name: Create compilation artifact
