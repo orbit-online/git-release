@@ -1,10 +1,17 @@
 name: Build
 
-on: [push, workflow_call]
+on:
+  push:
+    branches:
+    - '*'
+    tags:
+    - '*'
+    - '!v*' # Don't run on version tags, instead the release workflow will include this file and call the build step
+  workflow_call: {}
 
 jobs:
-  lint:
-    name: Lint
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -12,15 +19,8 @@ jobs:
       uses: ludeeus/action-shellcheck@master
       with:
         scandir: './src'
-
-  build:
-    name: Build
-    needs: [lint]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
     - name: Build the release
-      run: mkdir dist && cp -a src/git-release dist/
+      run: tools/build.sh
     - name: Create compilation artifact
       run: tar -cf ../dist.tar *
       working-directory: dist
