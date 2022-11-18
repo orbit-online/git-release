@@ -26,5 +26,8 @@
 			"name": "Brian Kejlberg",
 			"url": "https://github.com/thetrompf"
 		}
-	]
+	],
+	"devDependencies": {
+		"@orbit-online/git-release": "^0.2.0"
+	}
 }

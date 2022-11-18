@@ -2,3 +2,7 @@
 # yarn lockfile v1
 
 
+"@orbit-online/git-release@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@orbit-online/git-release/-/git-release-0.2.0.tgz#c77f49fcde6e7f14c6c402444e4ef5e8d2a1138d"
+  integrity sha512-ia6TaGFFGnvLCoko4WK36TR3jZ4gLQsipNLJRrSzk/pzCZ7v/oowNhm+vE+EN4XyUYB54pKhtvXs8MFQ+qvo+g==
