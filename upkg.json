@@ -1,0 +1,9 @@
+{
+  "commands": {
+    "git-release": "git-release.sh"
+  },
+  "dependencies": {
+    "andsens/docopt.sh": "v1.0.0-upkg",
+    "orbit-online/records.sh": "v0.9.3"
+  }
+}
