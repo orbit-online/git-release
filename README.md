@@ -1,5 +1,13 @@
 # git-release
 
+## Installation
+
+```
+upkg install -g orbit-online/git-release@<VERSION>
+```
+
+## Usage
+
 Tag git commits using semver versioning.  
 Tag/release messages are templated with commit messages from all changes since
 the last change.
