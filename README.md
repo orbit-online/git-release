@@ -1,16 +1,18 @@
 # git-release
 
+Tag git commits using semver versioning.  
+Tag/release messages are templated with commit messages from all changes since
+the last change.
+
 ## Installation
+
+With [μpkg](https://github.com/orbit-online/upkg)
 
 ```
 upkg install -g orbit-online/git-release@<VERSION>
 ```
 
 ## Usage
-
-Tag git commits using semver versioning.  
-Tag/release messages are templated with commit messages from all changes since
-the last change.
 
 When bumping a version git-release only considers the latest tag that is
 reachable from the tagged commit, the benefit being that you can maintain e.g.
