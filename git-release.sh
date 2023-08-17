@@ -15,7 +15,6 @@ Usage:
 
 Options:
   --ignore-dirty  Ignore a dirty working copy when REF is HEAD
-  -d, --debug     Turn on bash -x
   -n, --dry-run   Show the commands instead of running them and show changelog
   -h, --help      Show this screen
 
@@ -25,14 +24,14 @@ Notes:
   Use \`git-release previous' to show the previous version based on REF.
   REF defaults to HEAD.
 "
-# docopt parser below, refresh this parser with `docopt.sh git-release`
+# docopt parser below, refresh this parser with `docopt.sh git-release.sh`
 # shellcheck disable=2016,1090,1091,2034
 docopt() { source "$pkgroot/.upkg/andsens/docopt.sh/docopt-lib.sh" '1.0.0' || {
 ret=$?; printf -- "exit %d\n" "$ret"; exit "$ret"; }; set -e
-trimmed_doc=${DOC:0:662}; usage=${DOC:75:130}; digest=468c4
-shorts=(-d -n -h ''); longs=(--debug --dry-run --help --ignore-dirty)
-argcounts=(0 0 0 0); node_0(){ switch __debug 0; }; node_1(){ switch __dry_run 1
-}; node_2(){ switch __help 2; }; node_3(){ switch __ignore_dirty 3; }; node_4(){
+trimmed_doc=${DOC:0:628}; usage=${DOC:75:130}; digest=dd5df
+shorts=(-d -n -h ''); longs=('' --dry-run --help --ignore-dirty)
+argcounts=(0 0 0 0); node_0(){ switch _d 0; }; node_1(){ switch __dry_run 1; }
+node_2(){ switch __help 2; }; node_3(){ switch __ignore_dirty 3; }; node_4(){
 value REF a; }; node_5(){ value VERSION a; }; node_6(){ _command previous; }
 node_7(){ _command major; }; node_8(){ _command minor; }; node_9(){
 _command patch; }; node_10(){ optional 0 1 2; }; node_11(){ optional 4; }
@@ -41,13 +40,12 @@ node_12(){ required 10 6 11; }; node_13(){ optional 3; }; node_14(){ optional 13
 required 14 16 11; }; node_18(){ required 14 5 11; }; node_19(){ either 12 17 18
 }; node_20(){ required 19; }; cat <<<' docopt_exit() {
 [[ -n $1 ]] && printf "%s\n" "$1" >&2; printf "%s\n" "${DOC:75:130}" >&2; exit 1
-}'; unset var___debug var___dry_run var___help var___ignore_dirty var_REF \
+}'; unset var__d var___dry_run var___help var___ignore_dirty var_REF \
 var_VERSION var_previous var_major var_minor var_patch; parse 20 "$@"
-local prefix=${DOCOPT_PREFIX:-''}; unset "${prefix}__debug" \
-"${prefix}__dry_run" "${prefix}__help" "${prefix}__ignore_dirty" \
-"${prefix}REF" "${prefix}VERSION" "${prefix}previous" "${prefix}major" \
-"${prefix}minor" "${prefix}patch"
-eval "${prefix}"'__debug=${var___debug:-false}'
+local prefix=${DOCOPT_PREFIX:-''}; unset "${prefix}_d" "${prefix}__dry_run" \
+"${prefix}__help" "${prefix}__ignore_dirty" "${prefix}REF" "${prefix}VERSION" \
+"${prefix}previous" "${prefix}major" "${prefix}minor" "${prefix}patch"
+eval "${prefix}"'_d=${var__d:-false}'
 eval "${prefix}"'__dry_run=${var___dry_run:-false}'
 eval "${prefix}"'__help=${var___help:-false}'
 eval "${prefix}"'__ignore_dirty=${var___ignore_dirty:-false}'
@@ -57,16 +55,11 @@ eval "${prefix}"'major=${var_major:-false}'
 eval "${prefix}"'minor=${var_minor:-false}'
 eval "${prefix}"'patch=${var_patch:-false}'; local docopt_i=1
 [[ $BASH_VERSION =~ ^4.3 ]] && docopt_i=2; for ((;docopt_i>0;docopt_i--)); do
-declare -p "${prefix}__debug" "${prefix}__dry_run" "${prefix}__help" \
+declare -p "${prefix}_d" "${prefix}__dry_run" "${prefix}__help" \
 "${prefix}__ignore_dirty" "${prefix}REF" "${prefix}VERSION" \
 "${prefix}previous" "${prefix}major" "${prefix}minor" "${prefix}patch"; done; }
-# docopt parser above, complete command for generating this parser is `docopt.sh --library='"$pkgroot/.upkg/andsens/docopt.sh/docopt-lib.sh"' git-release`
+# docopt parser above, complete command for generating this parser is `docopt.sh --library='"$pkgroot/.upkg/andsens/docopt.sh/docopt-lib.sh"' git-release.sh`
   eval "$(docopt "$@")"
-
-  # shellcheck disable=2154
-  if $__debug; then
-    set -x
-  fi
 
   # shellcheck disable=2154
   if [[ -z $REF ]]; then
