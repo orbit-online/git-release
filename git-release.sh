@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
-
 main() {
+  set -eo pipefail
+  shopt -s inherit_errexit
   local pkgroot
   pkgroot=$(upkg root "${BASH_SOURCE[0]}")
   # shellcheck source=.upkg/orbit-online/records.sh/records.sh
