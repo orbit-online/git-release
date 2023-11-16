@@ -9,7 +9,7 @@ main() {
   source "$pkgroot/.upkg/orbit-online/records.sh/records.sh"
   DOC="git-release - Tag REF by either bumping the last version or specifying one
 Usage:
-  git-release [-dnh] previous [REF]
+  git-release previous [REF]
   git-release [options] (major|minor|patch) [REF]
   git-release [options] VERSION [REF]
 
@@ -28,36 +28,34 @@ Notes:
 # shellcheck disable=2016,1090,1091,2034
 docopt() { source "$pkgroot/.upkg/andsens/docopt.sh/docopt-lib.sh" '1.0.0' || {
 ret=$?; printf -- "exit %d\n" "$ret"; exit "$ret"; }; set -e
-trimmed_doc=${DOC:0:628}; usage=${DOC:75:130}; digest=dd5df
-shorts=(-d -n -h ''); longs=('' --dry-run --help --ignore-dirty)
-argcounts=(0 0 0 0); node_0(){ switch _d 0; }; node_1(){ switch __dry_run 1; }
-node_2(){ switch __help 2; }; node_3(){ switch __ignore_dirty 3; }; node_4(){
-value REF a; }; node_5(){ value VERSION a; }; node_6(){ _command previous; }
-node_7(){ _command major; }; node_8(){ _command minor; }; node_9(){
-_command patch; }; node_10(){ optional 0 1 2; }; node_11(){ optional 4; }
-node_12(){ required 10 6 11; }; node_13(){ optional 3; }; node_14(){ optional 13
-}; node_15(){ either 7 8 9; }; node_16(){ required 15; }; node_17(){
-required 14 16 11; }; node_18(){ required 14 5 11; }; node_19(){ either 12 17 18
-}; node_20(){ required 19; }; cat <<<' docopt_exit() {
-[[ -n $1 ]] && printf "%s\n" "$1" >&2; printf "%s\n" "${DOC:75:130}" >&2; exit 1
-}'; unset var__d var___dry_run var___help var___ignore_dirty var_REF \
-var_VERSION var_previous var_major var_minor var_patch; parse 20 "$@"
-local prefix=${DOCOPT_PREFIX:-''}; unset "${prefix}_d" "${prefix}__dry_run" \
-"${prefix}__help" "${prefix}__ignore_dirty" "${prefix}REF" "${prefix}VERSION" \
+trimmed_doc=${DOC:0:621}; usage=${DOC:75:123}; digest=6a677; shorts=(-n '' -h)
+longs=(--dry-run --ignore-dirty --help); argcounts=(0 0 0); node_0(){
+switch __dry_run 0; }; node_1(){ switch __ignore_dirty 1; }; node_2(){
+switch __help 2; }; node_3(){ value REF a; }; node_4(){ value VERSION a; }
+node_5(){ _command previous; }; node_6(){ _command major; }; node_7(){
+_command minor; }; node_8(){ _command patch; }; node_9(){ optional 3; }
+node_10(){ required 5 9; }; node_11(){ optional 0 1 2; }; node_12(){ optional 11
+}; node_13(){ either 6 7 8; }; node_14(){ required 13; }; node_15(){
+required 12 14 9; }; node_16(){ required 12 4 9; }; node_17(){ either 10 15 16
+}; node_18(){ required 17; }; cat <<<' docopt_exit() {
+[[ -n $1 ]] && printf "%s\n" "$1" >&2; printf "%s\n" "${DOC:75:123}" >&2; exit 1
+}'; unset var___dry_run var___ignore_dirty var___help var_REF var_VERSION \
+var_previous var_major var_minor var_patch; parse 18 "$@"
+local prefix=${DOCOPT_PREFIX:-''}; unset "${prefix}__dry_run" \
+"${prefix}__ignore_dirty" "${prefix}__help" "${prefix}REF" "${prefix}VERSION" \
 "${prefix}previous" "${prefix}major" "${prefix}minor" "${prefix}patch"
-eval "${prefix}"'_d=${var__d:-false}'
 eval "${prefix}"'__dry_run=${var___dry_run:-false}'
-eval "${prefix}"'__help=${var___help:-false}'
 eval "${prefix}"'__ignore_dirty=${var___ignore_dirty:-false}'
+eval "${prefix}"'__help=${var___help:-false}'
 eval "${prefix}"'REF=${var_REF:-}'; eval "${prefix}"'VERSION=${var_VERSION:-}'
 eval "${prefix}"'previous=${var_previous:-false}'
 eval "${prefix}"'major=${var_major:-false}'
 eval "${prefix}"'minor=${var_minor:-false}'
 eval "${prefix}"'patch=${var_patch:-false}'; local docopt_i=1
 [[ $BASH_VERSION =~ ^4.3 ]] && docopt_i=2; for ((;docopt_i>0;docopt_i--)); do
-declare -p "${prefix}_d" "${prefix}__dry_run" "${prefix}__help" \
-"${prefix}__ignore_dirty" "${prefix}REF" "${prefix}VERSION" \
-"${prefix}previous" "${prefix}major" "${prefix}minor" "${prefix}patch"; done; }
+declare -p "${prefix}__dry_run" "${prefix}__ignore_dirty" "${prefix}__help" \
+"${prefix}REF" "${prefix}VERSION" "${prefix}previous" "${prefix}major" \
+"${prefix}minor" "${prefix}patch"; done; }
 # docopt parser above, complete command for generating this parser is `docopt.sh --library='"$pkgroot/.upkg/andsens/docopt.sh/docopt-lib.sh"' git-release.sh`
   eval "$(docopt "$@")"
 
