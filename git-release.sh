@@ -11,6 +11,7 @@ Usage:
   git-release [options] VERSION [REF]
 
 Options:
+  --push          Push the new tag and branch upstream
   --ignore-dirty  Ignore a dirty working copy when REF is HEAD
   -n, --dry-run   Show the commands instead of running them and show changelog
   -h, --help      Show this screen
@@ -25,34 +26,36 @@ Notes:
 # shellcheck disable=2016,1090,1091,2034
 docopt() { source "$pkgroot/.upkg/andsens/docopt.sh/docopt-lib.sh" '1.0.0' || {
 ret=$?; printf -- "exit %d\n" "$ret"; exit "$ret"; }; set -e
-trimmed_doc=${DOC:0:621}; usage=${DOC:75:123}; digest=6a677; shorts=(-n '' -h)
-longs=(--dry-run --ignore-dirty --help); argcounts=(0 0 0); node_0(){
-switch __dry_run 0; }; node_1(){ switch __ignore_dirty 1; }; node_2(){
-switch __help 2; }; node_3(){ value REF a; }; node_4(){ value VERSION a; }
-node_5(){ _command previous; }; node_6(){ _command major; }; node_7(){
-_command minor; }; node_8(){ _command patch; }; node_9(){ optional 3; }
-node_10(){ required 5 9; }; node_11(){ optional 0 1 2; }; node_12(){ optional 11
-}; node_13(){ either 6 7 8; }; node_14(){ required 13; }; node_15(){
-required 12 14 9; }; node_16(){ required 12 4 9; }; node_17(){ either 10 15 16
-}; node_18(){ required 17; }; cat <<<' docopt_exit() {
-[[ -n $1 ]] && printf "%s\n" "$1" >&2; printf "%s\n" "${DOC:75:123}" >&2; exit 1
-}'; unset var___dry_run var___ignore_dirty var___help var_REF var_VERSION \
-var_previous var_major var_minor var_patch; parse 18 "$@"
-local prefix=${DOCOPT_PREFIX:-''}; unset "${prefix}__dry_run" \
-"${prefix}__ignore_dirty" "${prefix}__help" "${prefix}REF" "${prefix}VERSION" \
+trimmed_doc=${DOC:0:676}; usage=${DOC:75:123}; digest=6f305
+shorts=(-h '' -n ''); longs=(--help --push --dry-run --ignore-dirty)
+argcounts=(0 0 0 0); node_0(){ switch __help 0; }; node_1(){ switch __push 1; }
+node_2(){ switch __dry_run 2; }; node_3(){ switch __ignore_dirty 3; }; node_4(){
+value REF a; }; node_5(){ value VERSION a; }; node_6(){ _command previous; }
+node_7(){ _command major; }; node_8(){ _command minor; }; node_9(){
+_command patch; }; node_10(){ optional 4; }; node_11(){ required 6 10; }
+node_12(){ optional 0 1 2 3; }; node_13(){ optional 12; }; node_14(){
+either 7 8 9; }; node_15(){ required 14; }; node_16(){ required 13 15 10; }
+node_17(){ required 13 5 10; }; node_18(){ either 11 16 17; }; node_19(){
+required 18; }; cat <<<' docopt_exit() { [[ -n $1 ]] && printf "%s\n" "$1" >&2
+printf "%s\n" "${DOC:75:123}" >&2; exit 1; }'; unset var___help var___push \
+var___dry_run var___ignore_dirty var_REF var_VERSION var_previous var_major \
+var_minor var_patch; parse 19 "$@"; local prefix=${DOCOPT_PREFIX:-''}
+unset "${prefix}__help" "${prefix}__push" "${prefix}__dry_run" \
+"${prefix}__ignore_dirty" "${prefix}REF" "${prefix}VERSION" \
 "${prefix}previous" "${prefix}major" "${prefix}minor" "${prefix}patch"
+eval "${prefix}"'__help=${var___help:-false}'
+eval "${prefix}"'__push=${var___push:-false}'
 eval "${prefix}"'__dry_run=${var___dry_run:-false}'
 eval "${prefix}"'__ignore_dirty=${var___ignore_dirty:-false}'
-eval "${prefix}"'__help=${var___help:-false}'
 eval "${prefix}"'REF=${var_REF:-}'; eval "${prefix}"'VERSION=${var_VERSION:-}'
 eval "${prefix}"'previous=${var_previous:-false}'
 eval "${prefix}"'major=${var_major:-false}'
 eval "${prefix}"'minor=${var_minor:-false}'
 eval "${prefix}"'patch=${var_patch:-false}'; local docopt_i=1
 [[ $BASH_VERSION =~ ^4.3 ]] && docopt_i=2; for ((;docopt_i>0;docopt_i--)); do
-declare -p "${prefix}__dry_run" "${prefix}__ignore_dirty" "${prefix}__help" \
-"${prefix}REF" "${prefix}VERSION" "${prefix}previous" "${prefix}major" \
-"${prefix}minor" "${prefix}patch"; done; }
+declare -p "${prefix}__help" "${prefix}__push" "${prefix}__dry_run" \
+"${prefix}__ignore_dirty" "${prefix}REF" "${prefix}VERSION" \
+"${prefix}previous" "${prefix}major" "${prefix}minor" "${prefix}patch"; done; }
 # docopt parser above, complete command for generating this parser is `docopt.sh --library='"$pkgroot/.upkg/andsens/docopt.sh/docopt-lib.sh"' git-release.sh`
   eval "$(docopt "$@")"
 
@@ -143,11 +146,17 @@ You can list all versions with \`git tag -l --sort taggerdate 'v*'' and then tag
     fi
   fi
 
-  local branch push_cmd="git push $new_version" upstream
-  if branch=$(git symbolic-ref --short "$REF" 2>/dev/null) && upstream=$(git config "branch.$branch.remote" 2>/dev/null); then
-    push_cmd="git push --atomic $upstream $branch $new_version"
+  local branch upstream
+  if ! branch=$(git symbolic-ref --short "$REF" 2>/dev/null) || ! upstream=$(git config "branch.$branch.remote" 2>/dev/null); then
+    #shellcheck disable=2154
+    if $__push; then
+      fatal "Failed to determine current branch or its upstream, unable to push the new version"
+    fi
+  elif $__push; then
+    git push --atomic "$upstream" "$branch" "$new_version"
+  else
+    info "Release the new version by running \`git push --atomic %s %s %s' (or use \`--push' next time)\n" "$upstream" "$branch" "$new_version"
   fi
-  info "Release the new version by running \`%s'\n" "$push_cmd"
   return $ret
 }
 
