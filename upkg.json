@@ -1,9 +1,14 @@
 {
-  "commands": {
-    "git-release": "git-release.sh"
-  },
-  "dependencies": {
-    "andsens/docopt.sh": "v1.0.0-upkg",
-    "orbit-online/records.sh": "v0.9.5"
-  }
+  "$schema": "https://schemas.orbit.dev/upkg/upkg-v0.21.2.schema.json",
+  "name": "git-release",
+  "dependencies": [
+    {
+      "tar": "https://github.com/orbit-online/records.sh/releases/download/v0.9.6/records.sh.tar.gz",
+      "sha256": "9ef37448a3c35e64c1bcddeb6e42ba7650b3dfa4e2dc457c2f82364d4b6d343d"
+    },
+    {
+      "tar": "https://github.com/andsens/docopt.sh/releases/download/v2.0.0/docopt-lib.sh.tar.gz",
+      "sha256": "1d8b771418583cce2e6362c4c6b9a2cc506b241327424d5cc0b6fac8e8463806"
+    }
+  ]
 }

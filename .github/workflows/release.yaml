@@ -1,0 +1,18 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
+  release:
+    needs: [test]
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    name: Create GitHub release
+    steps:
+    - uses: orbit-online/upkg-release@v1

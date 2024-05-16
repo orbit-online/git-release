@@ -5,11 +5,7 @@ Tag/release messages are templated with all commit messages since the last tag.
 
 ## Installation
 
-With [μpkg](https://github.com/orbit-online/upkg)
-
-```
-upkg install -g orbit-online/git-release@<VERSION>
-```
+See [the latest release](https://github.com/orbit-online/git-release/releases/latest) for instructions.
 
 ## Usage
 
@@ -73,7 +69,7 @@ jobs:
         artifactErrorsFailBuild: true
 ```
 
-### Options
+### Inputs
 
 | Name                | Description                            | Default             |
 | ------------------- | -------------------------------------- | ------------------- |
