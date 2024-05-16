@@ -119,9 +119,6 @@ $(git rev-list --format=%s "$REF...$previous_version" | grep -Pv '^commit ' | se
 "
   else
     release_notes="# Release notes were prepared for you, describe the first release.
-$new_version
-------
-
 Initial release.
 "
   fi
