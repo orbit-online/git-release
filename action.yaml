@@ -1,0 +1,39 @@
+name: git-release
+description: Retrieve the tag and tag message from the git HEAD of a working copy
+inputs:
+  ref:
+    description: The git ref to use. Defaults to `github.ref`.
+    default: ${{ github.ref }}
+    required: false
+  working-directory:
+    description: The working copy of the git repository to extract the tag and tag message from.
+    default: "."
+    required: false
+outputs:
+  tag:
+    description: The git tag
+    value: ${{ steps.tag.outputs.tag }}
+  message:
+    description: The git tag message
+    value: ${{ steps.message.outputs.message }}
+runs:
+  using: composite
+  steps:
+  - name: Get tag from ref
+    shell: bash
+    id: tag
+    run: |
+      readarray -t -d $'\n' refs < <(git -C "${{ inputs.working-directory }}" tag -l --points-at "${{ inputs.ref }}")
+      if [[ ${#refs[@]} -ne 1 ]]; then
+        printf 'Unable to uniquely determine the tag from the ref '%s', make sure to checkout using ${{ '${{ github.ref }}' }}:\n    - uses: actions/checkout@v4\n      with:\n        ref: ${{ '${{ github.ref }}' }}\n' "$REF" >&2
+        exit 1
+      fi
+      printf "tag=%s\n" "${refs[0]}" >> $GITHUB_OUTPUT
+  - name: Get tag message
+    shell: bash
+    id: message
+    run: |
+      eof="$(openssl rand -hex 8)"
+      msg=$(git -C "${{ inputs.working-directory }}" tag -l --format='%(contents)' "${{ steps.tag.outputs.tag }}")
+      msg=${msg%%'-----BEGIN'*}
+      printf "message<<%s\n%s\n%s\n" "$eof" "$msg" "$eof" >> $GITHUB_OUTPUT

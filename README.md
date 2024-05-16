@@ -1,8 +1,7 @@
 # git-release
 
 Tag git commits using semver versioning.  
-Tag/release messages are templated with commit messages from all changes since
-the last change.
+Tag/release messages are templated with all commit messages since the last tag.
 
 ## Installation
 
@@ -38,3 +37,52 @@ Notes:
   Use `git-release previous' to show the previous version based on REF.
   REF defaults to HEAD.
 ```
+
+## Github action
+
+You can extract the tag and tag message using the `orbit-online/git-release`
+action in order to automate GitHub releases:
+
+```
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    name: Create GitHub release
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+    - name: Get release notes
+      id: release
+      uses: orbit-online/git-release@v1
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        name: ${{ steps.release.outputs.tag }}
+        body: ${{ steps.release.outputs.message }}
+        draft: false
+        prerelease: false
+        artifactErrorsFailBuild: true
+```
+
+### Options
+
+| Name                | Description                            | Default             |
+| ------------------- | -------------------------------------- | ------------------- |
+| `ref`               | The git ref to use                     | `${{ github.ref }}` |
+| `working-directory` | The working copy of the git repository | `.`                 |
+
+### Outputs
+
+| Name      | Description     |
+| --------- | --------------- |
+| `tag`     | The git tag     |
+| `message` | The tag message |
