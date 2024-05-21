@@ -102,10 +102,8 @@ local p=${DOCOPT_PREFIX:-''};for varname in "${varnames[@]}"; do unset \
   local release_notes
   if [[ -n $previous_version ]]; then
     release_notes="# Release notes were prepared for you, categorize/remove the changes as you see fit.
-$new_version
-------
-
 Changes since $previous_version:
+---
 $(git rev-list --format=%s "$REF...$previous_version" | grep -Pv '^commit ' | sed 's/^/* /g')
 "
   else
