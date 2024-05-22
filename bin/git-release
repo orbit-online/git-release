@@ -4,6 +4,7 @@
 main() {
   set -eo pipefail; shopt -s inherit_errexit
   local pkgroot; pkgroot=$(realpath "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/..")
+  # shellcheck disable=SC1091
   source "$pkgroot/.upkg/records.sh/records.sh"
   DOC="git-release - Tag REF by either bumping the last version or specifying one
 Usage:
