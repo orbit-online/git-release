@@ -26,28 +26,29 @@ Notes:
 "
 # docopt parser below, refresh this parser with `docopt.sh git-release`
 # shellcheck disable=2016,2086,2317,1090,1091,2034
-docopt() { source "$pkgroot/.upkg/docopt-lib.sh/docopt-lib.sh" '2.0.0' || {
-ret=$?;printf -- "exit %d\n" "$ret";exit "$ret";};set -e
-trimmed_doc=${DOC:0:676};usage=${DOC:75:123};digest=6f305;options=(' --push 0' \
-' --ignore-dirty 0' '-n --dry-run 0' '-h --help 0');node_0(){ switch __push 0;}
-node_1(){ switch __ignore_dirty 1;};node_2(){ switch __dry_run 2;};node_3(){
-switch __help 3;};node_4(){ value REF a;};node_5(){ value VERSION a;};node_6(){
-switch previous a:previous;};node_7(){ switch major a:major;};node_8(){ switch \
-minor a:minor;};node_9(){ switch patch a:patch;};node_10(){ sequence 6 11;}
-node_11(){ optional 4;};node_12(){ sequence 13 14 11;};node_13(){ optional 0 1 \
-2 3;};node_14(){ choice 7 8 9;};node_15(){ sequence 13 5 11;};node_16(){
-choice 10 12 15;};cat <<<' docopt_exit() { [[ -n $1 ]] && printf "%s\n" "$1" >&2
-printf "%s\n" "${DOC:75:123}" >&2;exit 1;}';local varnames=(__push \
-__ignore_dirty __dry_run __help REF VERSION previous major minor patch) varname
-for varname in "${varnames[@]}"; do unset "var_$varname";done;parse 16 "$@"
-local p=${DOCOPT_PREFIX:-''};for varname in "${varnames[@]}"; do unset \
-"$p$varname";done;eval $p'__push=${var___push:-false};'$p'__ignore_dirty=${var'\
-'___ignore_dirty:-false};'$p'__dry_run=${var___dry_run:-false};'$p'__help=${va'\
-'r___help:-false};'$p'REF=${var_REF:-};'$p'VERSION=${var_VERSION:-};'$p'previo'\
-'us=${var_previous:-false};'$p'major=${var_major:-false};'$p'minor=${var_minor'\
-':-false};'$p'patch=${var_patch:-false};';local docopt_i=1;[[ $BASH_VERSION =~ \
-^4.3 ]] && docopt_i=2;for ((;docopt_i>0;docopt_i--)); do for varname in \
-"${varnames[@]}"; do declare -p "$p$varname";done;done;}
+docopt() { local v='2.0.1'; source \
+"$pkgroot/.upkg/docopt-lib.sh/docopt-lib.sh" "$v" || { ret=$?;printf -- "exit \
+%d\n" "$ret";exit "$ret";};set -e;trimmed_doc=${DOC:0:676};usage=${DOC:75:123}
+digest=6f305;options=(' --push 0' ' --ignore-dirty 0' '-n --dry-run 0' '-h --h'\
+'elp 0');node_0(){ switch __push 0;};node_1(){ switch __ignore_dirty 1;}
+node_2(){ switch __dry_run 2;};node_3(){ switch __help 3;};node_4(){ value REF a
+};node_5(){ value VERSION a;};node_6(){ switch previous a:previous;};node_7(){
+switch major a:major;};node_8(){ switch minor a:minor;};node_9(){ switch patch \
+a:patch;};node_10(){ sequence 6 11;};node_11(){ optional 4;};node_12(){
+sequence 13 14 11;};node_13(){ optional 0 1 2 3;};node_14(){ choice 7 8 9;}
+node_15(){ sequence 13 5 11;};node_16(){ choice 10 12 15;};cat <<<' \
+docopt_exit() { [[ -n $1 ]] && printf "%s\n" "$1" >&2;printf "%s\n" \
+"${DOC:75:123}" >&2;exit 1;}';local varnames=(__push __ignore_dirty __dry_run \
+__help REF VERSION previous major minor patch) varname;for varname in \
+"${varnames[@]}"; do unset "var_$varname";done;parse 16 "$@";local \
+p=${DOCOPT_PREFIX:-''};for varname in "${varnames[@]}"; do unset "$p$varname"
+done;eval $p'__push=${var___push:-false};'$p'__ignore_dirty=${var___ignore_dir'\
+'ty:-false};'$p'__dry_run=${var___dry_run:-false};'$p'__help=${var___help:-fal'\
+'se};'$p'REF=${var_REF:-};'$p'VERSION=${var_VERSION:-};'$p'previous=${var_prev'\
+'ious:-false};'$p'major=${var_major:-false};'$p'minor=${var_minor:-false};'\
+$p'patch=${var_patch:-false};';local docopt_i=1;[[ $BASH_VERSION =~ ^4.3 ]] && \
+docopt_i=2;for ((;docopt_i>0;docopt_i--)); do for varname in "${varnames[@]}"; \
+do declare -p "$p$varname";done;done;}
 # docopt parser above, complete command for generating this parser is `docopt.sh --library='"$pkgroot/.upkg/docopt-lib.sh/docopt-lib.sh"' git-release`
   eval "$(docopt "$@")"
 
