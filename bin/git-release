@@ -101,6 +101,8 @@ do declare -p "$p$varname";done;done;}
 
   local release_notes
   if [[ -n $previous_version ]]; then
+    [[ -n $(git rev-list --format=%s "$REF...$previous_version") ]] || \
+      fatal "The version you intend to release and the previous version (%s) are the same git ref (%s)" "$previous_version" "$REF"
     release_notes="# Release notes were prepared for you, categorize/remove the changes as you see fit.
 Changes since $previous_version:
 ---
