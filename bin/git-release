@@ -90,10 +90,8 @@ do declare -p "$p$varname";done;done;}
     fi
     new_version=$(printf -- "%s%s.%s.%s\n" "$P" "$v_major" "$v_minor" "$v_patch")
   else
+    [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+([+-].+)?$ ]] || docopt_exit "\`$VERSION' is not in prefix-less semver format."
     new_version=${P}${VERSION}
-    if [[ ! ${new_version#"$P"} =~ ^v[0-9]+\.[0-9]+\.[0-9]+([+-].+)?$ ]]; then
-      docopt_exit "\`$VERSION' is not in semver format."
-    fi
   fi
 
   # shellcheck disable=2154
