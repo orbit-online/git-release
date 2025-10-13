@@ -25,32 +25,33 @@ Notes:
   REF defaults to HEAD.
 "
 # docopt parser below, refresh this parser with `docopt.sh git-release`
-# shellcheck disable=2016,2086,2317,1090,1091,2034
-docopt() { local v='2.0.2'; source \
-"$pkgroot/.upkg/docopt-lib-v$v/docopt-lib.sh" "$v" || { ret=$?;printf -- "exit \
-%d\n" "$ret";exit "$ret";};set -e;trimmed_doc=${DOC:0:764};usage=${DOC:75:140}
-digest=587a3;options=('-p --prefix 1' ' --push 0' ' --ignore-dirty 0' '-n --dr'\
-'y-run 0' '-h --help 0');node_0(){ value __prefix 0;};node_1(){ switch __push 1
-};node_2(){ switch __ignore_dirty 2;};node_3(){ switch __dry_run 3;};node_4(){
-switch __help 4;};node_5(){ value REF a;};node_6(){ value VERSION a;};node_7(){
-switch previous a:previous;};node_8(){ switch major a:major;};node_9(){ switch \
-minor a:minor;};node_10(){ switch patch a:patch;};node_11(){ sequence 12 7 13;}
-node_12(){ optional 0;};node_13(){ optional 5;};node_14(){ sequence 15 16 13;}
-node_15(){ optional 0 1 2 3 4;};node_16(){ choice 8 9 10;};node_17(){ sequence \
-15 6 13;};node_18(){ choice 11 14 17;};cat <<<' docopt_exit() { [[ -n $1 ]] && \
-printf "%s\n" "$1" >&2;printf "%s\n" "${DOC:75:140}" >&2;exit 1;}';local \
-varnames=(__prefix __push __ignore_dirty __dry_run __help REF VERSION previous \
-major minor patch) varname;for varname in "${varnames[@]}"; do unset \
-"var_$varname";done;parse 18 "$@";local p=${DOCOPT_PREFIX:-''};for varname in \
-"${varnames[@]}"; do unset "$p$varname";done;eval $p'__prefix=${var___prefix:-'\
-'v};'$p'__push=${var___push:-false};'$p'__ignore_dirty=${var___ignore_dirty:-f'\
-'alse};'$p'__dry_run=${var___dry_run:-false};'$p'__help=${var___help:-false};'\
-$p'REF=${var_REF:-};'$p'VERSION=${var_VERSION:-};'$p'previous=${var_previous:-'\
-'false};'$p'major=${var_major:-false};'$p'minor=${var_minor:-false};'$p'patch='\
-'${var_patch:-false};';local docopt_i=1;[[ $BASH_VERSION =~ ^4.3 ]] && \
-docopt_i=2;for ((;docopt_i>0;docopt_i--)); do for varname in "${varnames[@]}"; \
-do declare -p "$p$varname";done;done;}
-# docopt parser above, complete command for generating this parser is `docopt.sh --library='"$pkgroot/.upkg/docopt-lib-v$v/docopt-lib.sh"' git-release`
+# shellcheck disable=2016,2086,2329,1090,1091,2034
+docopt() { local v='2.0.3'; source \
+"$pkgroot/.upkg/docopt-lib.sh-v$v/docopt-lib.sh" "$v" || { ret=$?;printf -- \
+"exit %d\n" "$ret";exit "$ret";};set -e;trimmed_doc=${DOC:0:764}
+usage=${DOC:75:140};digest=587a3;options=('-p --prefix 1' ' --push 0' ' --igno'\
+'re-dirty 0' '-n --dry-run 0' '-h --help 0');node_0(){ value __prefix 0;}
+node_1(){ switch __push 1;};node_2(){ switch __ignore_dirty 2;};node_3(){
+switch __dry_run 3;};node_4(){ switch __help 4;};node_5(){ value REF a;}
+node_6(){ value VERSION a;};node_7(){ switch previous a:previous;};node_8(){
+switch major a:major;};node_9(){ switch minor a:minor;};node_10(){ switch \
+patch a:patch;};node_11(){ sequence 12 7 13;};node_12(){ optional 0;};node_13(){
+optional 5;};node_14(){ sequence 15 16 13;};node_15(){ optional 0 1 2 3 4;}
+node_16(){ choice 8 9 10;};node_17(){ sequence 15 6 13;};node_18(){ choice 11 \
+14 17;};cat <<<' docopt_exit() { [[ -n $1 ]] && printf "%s\n" "$1" >&2;printf \
+"%s\n" "${DOC:75:140}" >&2;exit 1;}';local varnames=(__prefix __push \
+__ignore_dirty __dry_run __help REF VERSION previous major minor patch) varname
+for varname in "${varnames[@]}"; do unset "var_$varname";done;parse 18 "$@"
+local p=${DOCOPT_PREFIX:-''};for varname in "${varnames[@]}"; do unset \
+"$p$varname";done;eval $p'__prefix=${var___prefix:-v};'$p'__push=${var___push:'\
+'-false};'$p'__ignore_dirty=${var___ignore_dirty:-false};'$p'__dry_run=${var__'\
+'_dry_run:-false};'$p'__help=${var___help:-false};'$p'REF=${var_REF:-};'$p'VER'\
+'SION=${var_VERSION:-};'$p'previous=${var_previous:-false};'$p'major=${var_maj'\
+'or:-false};'$p'minor=${var_minor:-false};'$p'patch=${var_patch:-false};'
+local docopt_i=1;[[ $BASH_VERSION =~ ^4.3 ]] && docopt_i=2;for \
+((;docopt_i>0;docopt_i--)); do for varname in "${varnames[@]}"; do declare -p \
+"$p$varname";done;done;}
+# docopt parser above, complete command for generating this parser is `docopt.sh --library='"$pkgroot/.upkg/docopt-lib.sh-v$v/docopt-lib.sh"' git-release`
   eval "$(docopt "$@")"
 
   # shellcheck disable=2154
