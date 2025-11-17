@@ -117,7 +117,6 @@ Initial release.
   local tag_msg_file
   tag_msg_file=$(git rev-parse --git-dir)/TAG_EDITMSG
 
-  local ret=0
   #shellcheck disable=2154
   if $__dry_run; then
     #shellcheck disable=2028
@@ -129,7 +128,7 @@ Initial release.
       # shellcheck disable=2183
       error "Unable to tag %s with %s, the version might already exist on a different branch.
 You can list all versions with \`git tag -l --sort taggerdate '%s*'' and then tag manually with \`git tag -e -F %s %s %s'" "$REF" "$new_version" "$P" "$tag_msg_file" "$new_version" "$REF"
-      ret=1
+      return 1
     else
       info "%s tagged with %s" "$REF" "$new_version"
     fi
@@ -146,7 +145,7 @@ You can list all versions with \`git tag -l --sort taggerdate '%s*'' and then ta
   else
     info "Release the new version by running \`git push --atomic %s %s %s' (or use \`--push' next time)\n" "$upstream" "$branch" "$new_version"
   fi
-  return $ret
+  return 0
 }
 
 main "$@"
