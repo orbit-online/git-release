@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Create GitHub release
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         ref: ${{ github.ref }}
     - name: Get release notes

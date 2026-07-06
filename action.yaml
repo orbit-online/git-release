@@ -25,7 +25,7 @@ runs:
     run: |
       readarray -t -d $'\n' refs < <(git -C "${{ inputs.working-directory }}" tag -l --points-at "${{ inputs.ref }}")
       if [[ ${#refs[@]} -ne 1 ]]; then
-        printf 'Unable to uniquely determine the tag from the ref '%s', make sure to checkout using ${{ '${{ github.ref }}' }}:\n    - uses: actions/checkout@v4\n      with:\n        ref: ${{ '${{ github.ref }}' }}\n' "$REF" >&2
+        printf 'Unable to uniquely determine the tag from the ref '%s', make sure to checkout using ${{ '${{ github.ref }}' }}:\n    - uses: actions/checkout@v7\n      with:\n        ref: ${{ '${{ github.ref }}' }}\n' "$REF" >&2
         exit 1
       fi
       printf "tag=%s\n" "${refs[0]}" >> $GITHUB_OUTPUT
